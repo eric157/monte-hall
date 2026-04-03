@@ -49,6 +49,25 @@ body {
   margin-bottom: 1rem;
 }
 
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.brand-copy {
+  min-width: 0;
+}
+
+.site-logo {
+  width: clamp(62px, 8vw, 84px);
+  height: clamp(62px, 8vw, 84px);
+  border-radius: 18px;
+  border: 1px solid rgba(28, 45, 59, 0.18);
+  box-shadow: 0 8px 20px rgba(18, 49, 68, 0.18);
+  flex-shrink: 0;
+}
+
 .kicker {
   margin: 0 0 0.22rem;
   letter-spacing: 0.08em;
@@ -385,6 +404,16 @@ code {
 }
 
 @media (max-width: 860px) {
+  .brand-row {
+    align-items: flex-start;
+  }
+
+  .site-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+  }
+
   .explain-grid {
     grid-template-columns: 1fr;
   }
