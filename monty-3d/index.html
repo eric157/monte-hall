@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monty Hall 3D Lab</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/three@0.158/build/three.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script defer src="bayesian.js"></script>
+  <script defer src="main.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <p class="kicker">Probability Lab</p>
+      <h1>Monty Hall Visual Simulator</h1>
+      <p class="hero-copy">
+        Explore a classic probability paradox with a live 3D scene, decision trace, and Bayesian learning chart.
+      </p>
+      <div class="hero-metrics">
+        <div class="hero-metric">
+          <span>Theoretical Switch Win Rate</span>
+          <strong>66.7%</strong>
+        </div>
+        <div class="hero-metric">
+          <span>Theoretical Stay Win Rate</span>
+          <strong>33.3%</strong>
+        </div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="visual-column">
+        <section class="panel-card">
+          <h2>3D Simulation Stage</h2>
+          <section id="scene-wrap" aria-label="3D Monty Hall simulation">
+            <canvas id="three-canvas"></canvas>
+            <p id="error-banner" hidden></p>
+          </section>
+          <ul class="scene-legend">
+            <li><i class="dot stay"></i><span>Your first choice (stay door)</span></li>
+            <li><i class="dot switch"></i><span>Switch target door</span></li>
+            <li><i class="dot host"></i><span>Host opened goat door</span></li>
+          </ul>
+        </section>
+      </section>
+
+      <aside id="panel" class="side-column">
+        <section class="panel-card">
+          <h2>Simulation Controls</h2>
+          <div class="control-grid">
+            <button id="run-1" type="button">Run 1 Trial</button>
+            <button id="run-10" type="button">Run 10 Trials</button>
+            <button id="run-100" type="button">Run 100 Trials</button>
+            <button id="auto-toggle" type="button">Start Auto</button>
+            <button id="reset" type="button" class="danger">Reset</button>
+          </div>
+          <label for="auto-speed">
+            Auto speed
+            <span id="auto-speed-value">120</span>
+            trials/sec
+          </label>
+          <input id="auto-speed" type="range" min="10" max="1000" value="120" step="10" />
+          <p class="helper-text">Use auto mode to see long-run behavior converge toward the true probabilities.</p>
+        </section>
+
+        <section class="panel-card">
+          <h2>Live Stats</h2>
+          <ul class="stats-list">
+            <li><span>Trials</span><strong id="trial-count">0</strong></li>
+            <li><span>Stay Win Rate</span><strong id="stay-rate">0.000</strong></li>
+            <li><span>Switch Win Rate</span><strong id="switch-rate">0.000</strong></li>
+            <li><span>Switch Advantage</span><strong id="switch-advantage">0.000</strong></li>
+          </ul>
+          <p id="round-detail">No trials run yet.</p>
+          <div class="trace-box">
+            <h3>Decision Trace</h3>
+            <ul class="trace-list">
+              <li><span>Before reveal (your choice)</span><strong id="trace-first">Door -</strong></li>
+              <li><span>Host opened</span><strong id="trace-host">Door -</strong></li>
+              <li><span>If you switch, go to</span><strong id="trace-switch">Door -</strong></li>
+              <li><span>Stay outcome</span><strong id="trace-stay-outcome">-</strong></li>
+              <li><span>Switch outcome</span><strong id="trace-switch-outcome">-</strong></li>
+            </ul>
+            <p id="trace-why">
+              Why switch: initial door is right only 1/3, so the other unopened door carries 2/3 after host reveals a goat.
+            </p>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <h2>Bayesian Posterior Means</h2>
+          <div class="chart-shell">
+            <canvas id="chart"></canvas>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <section class="explain-grid">
+      <article class="panel-card explain-card">
+        <h2>Intuition First (Beginner Friendly)</h2>
+        <p>
+          You choose one door. At that moment, your chosen door has only a 1 in 3 chance of hiding gold.
+          The other two doors together hold the remaining 2 in 3 chance.
+        </p>
+        <p>
+          Then the host opens one of those two other doors, but only a goat door. He never reveals gold.
+          So he removes a losing option and leaves one unopened alternative. That remaining alternative keeps most of the probability mass.
+        </p>
+        <p class="equation">Switching is strong because it effectively bets on your first choice being wrong, which happens 2/3 of the time.</p>
+      </article>
+
+      <article class="panel-card explain-card">
+        <h2>Formal Model (Math + Statistics)</h2>
+        <p>
+          Define random variables: prize door <code>P</code>, first choice <code>C</code>, host reveal <code>H</code>, and switch door <code>S</code>.
+          Sampling and constraints are:
+        </p>
+        <p class="equation">
+          <code>P, C ~ Uniform({1,2,3})</code>, with <code>H != C</code> and <code>H != P</code>, and <code>S != C</code>, <code>S != H</code>.
+        </p>
+        <p>
+          Win events are:
+        </p>
+        <p class="equation">
+          <code>W_stay = {C = P}</code>, <code>W_switch = {S = P}</code>.
+        </p>
+        <p>
+          Since <code>P(C=P)=1/3</code>, we get <code>P(W_stay)=1/3</code> and <code>P(W_switch)=2/3</code>.
+          Under repeated trials, empirical rates converge by the Law of Large Numbers.
+        </p>
+      </article>
+
+      <article class="panel-card explain-card full-width">
+        <h2>How We Track Learning: Frequentist + Bayesian</h2>
+        <p>
+          Frequentist view:
+        </p>
+        <p class="equation">
+          <code>stayRate = stayWins / trials</code>, <code>switchRate = switchWins / trials</code>.
+        </p>
+        <p>
+          Bayesian view:
+        </p>
+        <p class="equation">
+          <code>p_stay ~ Beta(alpha_stay, beta_stay)</code>, <code>p_switch ~ Beta(alpha_switch, beta_switch)</code>,
+          starting from <code>Beta(1,1)</code> priors.
+        </p>
+        <p>
+          After each trial we update success/failure counts and plot posterior means:
+          <code>E[p] = alpha / (alpha + beta)</code>.
+          This gives a smooth learning curve that still converges near <code>0.333</code> (stay) and <code>0.667</code> (switch).
+        </p>
+      </article>
+    </section>
+  </div>
+</body>
+</html>
