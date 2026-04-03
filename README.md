@@ -6,6 +6,7 @@ A visual simulator of the Monty Hall problem with:
 - live trial stats (stay vs switch win rates)
 - Bayesian posterior tracking with a chart
 - beginner-friendly intuition plus formal probability explanation in-app
+- a polished Jupyter notebook walkthrough (`monte-hall.ipynb`)
 
 ## Project Structure
 
@@ -14,6 +15,8 @@ A visual simulator of the Monty Hall problem with:
 - `monty-3d/main.js` - 3D scene, trial simulation, decision trace, animation
 - `monty-3d/bayesian.js` - Bayesian updates and chart rendering
 - `monty-3d/assets/` - door and reward/goat PNG assets
+- `.github/workflows/deploy-pages.yml` - GitHub Pages deployment workflow
+- `Dockerfile` + `docker-compose.yml` - containerized static hosting
 
 ## Quick Start
 
@@ -27,6 +30,38 @@ python -m http.server 4173
 Open:
 
 `http://127.0.0.1:4173/index.html`
+
+## GitHub Pages Deployment
+
+This repository includes a GitHub Actions workflow that deploys `monty-3d/` to GitHub Pages:
+
+- workflow file: `.github/workflows/deploy-pages.yml`
+- trigger: push to `main` or `master` with changes in `monty-3d/**`
+
+One-time setup in your GitHub repository settings:
+
+1. Go to `Settings` -> `Pages`
+2. Set source to `GitHub Actions`
+3. Push to `main`/`master` and wait for the workflow to publish
+
+## Run with Docker
+
+Build and run:
+
+```bash
+docker compose up --build
+```
+
+Open:
+
+`http://127.0.0.1:8080`
+
+Or with plain Docker:
+
+```bash
+docker build -t monty-3d .
+docker run --rm -p 8080:80 monty-3d
+```
 
 ## What You Should Observe
 
